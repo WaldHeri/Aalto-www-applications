@@ -7,8 +7,8 @@ var pointerDownName = 'pointerdown';
 var pointerUpName = 'pointerup';
 var pointerMoveName = 'pointermove';
 var rafPending = false;
-var initialTouchPos = null;
-var lastTouchPos = null;
+var initialTouchPos = {};
+var lastTouchPos = {};
 var ActivePointers = [];
 
 var touchTarget = window;
@@ -32,21 +32,25 @@ if (window.PointerEvent || window.navigator.msPointerEnabled) {
 // Handle the start of gestures
 function handleGestureStart(evt) {
     evt.preventDefault();
-    console.log("touch start");
+    
+    console.log("touch start " + ActivePointers.length);
     if (evt.touches && evt.touches.length > 1) {
         return;
     }
-    ActivePointers.push(evt);
+    
     // Add the move and end listeners
     if (window.PointerEvent) {
         evt.target.setPointerCapture(evt.pointerId);
+        ActivePointers.push(evt);
+        console.log("touch pointerid: " + evt.pointerId);
+        initialTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
     } else {
         // Add Mouse Listeners
         document.addEventListener('mousemove', this.handleGestureMove, true);
         document.addEventListener('mouseup', this.handleGestureEnd, true);
     }
 
-    initialTouchPos = getGesturePointFromEvent(evt);
+    
 
 
 };
@@ -54,7 +58,9 @@ function handleGestureStart(evt) {
 // Handle end gestures
 function handleGestureEnd(evt) {
     evt.preventDefault();
-    console.log("touch end");
+    ActivePointers = [];
+    console.log("touch end: " + ActivePointers.length);
+
     if (evt.touches && evt.touches.length > 0) {
         return;
     }
@@ -71,8 +77,9 @@ function handleGestureEnd(evt) {
     }
 
 
-    ActivePointers = [];
-    initialTouchPos = null;
+    
+    initialTouchPos = {};
+    lastTouchPos = {};
 }
 
 function handleGestureMove(evt) {
@@ -81,11 +88,8 @@ function handleGestureMove(evt) {
     if (!initialTouchPos) {
         return;
     }
-
-    lastTouchPos = getGesturePointFromEvent(evt);
-    console.log("touch move: " + lastTouchPos.x + "  " + lastTouchPos.y);
-    console.log(ActivePointers.length);
-    if(ActivePointers.length = 2){
+    lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
+    if(ActivePointers.length == 3){
         window.scrollTo({
             top: 0,
             left: 0,
@@ -118,6 +122,30 @@ function getGesturePointFromEvent(evt) {
     }
 
     return point;
+}
+
+function getDirectionFromEvents(){
+    var up = true;
+    var down = true;
+    
+    for (var i = 0; i < ActivePointers.length; i++ ){
+        var id = ActivePointers[i].pointerId;
+        var deltaY = lastTouchPos[id].y - initialTouchPos[id].y;
+        if(deltaY >= 0){
+            up = false;
+        }
+        if(deltaY <= 0){
+            down = false;
+        }
+
+    }
+    if(up){
+        return "up";
+    } else if(down){
+        return "down";
+    }else{
+        return "none";
+    }
 }
 
 
