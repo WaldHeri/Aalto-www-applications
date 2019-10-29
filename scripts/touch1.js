@@ -89,6 +89,7 @@ function handleGestureMove(evt) {
         return;
     }
     lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
+    alert("active pointers: " + ActivePointers.length);
     if(ActivePointers.length == 2){
         window.scrollTo({
             top: 0,
