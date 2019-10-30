@@ -96,13 +96,21 @@ function handleGestureMove(evt) {
     }
     lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
     
-    if (ActivePointers.length === 3){
+    let direction = getDirectionFromEvents();
+
+    if (ActivePointers.length === 3 && direction === "up") {
         let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
             top: scrollingElement.scrollHeight,
             left: 0,
             behavior: 'smooth'
-          });
+        });
+    } else if (ActivePointers.length === 3 && direction === "down") {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+        });
     }
     
     if (rafPending) {
@@ -133,25 +141,25 @@ function getGesturePointFromEvent(evt) {
 }
 
 function getDirectionFromEvents(){
-    var up = true;
-    var down = true;
+    let up = true;
+    let down = true;
     
-    for (var i = 0; i < ActivePointers.length; i++ ){
-        var id = ActivePointers[i].pointerId;
-        var deltaY = lastTouchPos[id].y - initialTouchPos[id].y;
-        if(deltaY >= 0){
+    for (let i = 0; i < ActivePointers.length; i++) {
+        let id = ActivePointers[i].pointerId;
+        let deltaY = lastTouchPos[id].y - initialTouchPos[id].y;
+        if (deltaY >= 0) {
             up = false;
         }
-        if(deltaY <= 0){
+        if (deltaY <= 0) {
             down = false;
         }
 
     }
-    if(up){
+    if (up) {
         return "up";
-    } else if(down){
+    } else if (down) {
         return "down";
-    }else{
+    } else {
         return "none";
     }
 }
