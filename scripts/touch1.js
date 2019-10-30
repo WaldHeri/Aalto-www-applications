@@ -34,6 +34,9 @@ function handleGestureStart(evt) {
     evt.preventDefault();
     
     console.log("touch start " + ActivePointers.length);
+
+    // alert("active pointers: " + ActivePointers.length);
+
     if (evt.touches && evt.touches.length > 1) {
         return;
     }
@@ -83,16 +86,20 @@ function handleGestureEnd(evt) {
 }
 
 function handleGestureMove(evt) {
+
+    console.log("HANDLE GESTURE MOVE!");
+
     evt.preventDefault();
     
     if (!initialTouchPos) {
         return;
     }
     lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
-    alert("active pointers: " + ActivePointers.length);
-    if(ActivePointers.length == 2){
+    
+    if (ActivePointers.length === 3){
+        let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
-            top: 0,
+            top: scrollingElement.scrollHeight,
             left: 0,
             behavior: 'smooth'
           });
@@ -151,7 +158,7 @@ function getDirectionFromEvents(){
 
 
 if (window.PointerEvent) {
-    console.log("PointerEvent true ");
+    console.log("PointerEvent true!");
     touchTarget.addEventListener('pointerdown', this.handleGestureStart, true);
     touchTarget.addEventListener('pointermove', this.handleGestureMove, true);
     touchTarget.addEventListener('pointerup', this.handleGestureEnd, true);
@@ -165,7 +172,14 @@ if (window.PointerEvent) {
     touchTarget.addEventListener('mousedown', this.handleGestureStart, true);
 }
 
+function handleGestureEnd(evt) {
+    console.log("handleGestureEnd");
+    console.log(ActivePointers.length);
 
+    // remove all active pointers when gesture handling is done
+    ActivePointers = [];
+    console.log(ActivePointers.length);
+}
 
 
 window.onload = function () {
