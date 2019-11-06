@@ -111,6 +111,20 @@ function handleGestureMove(evt) {
             left: 0,
             behavior: 'smooth'
         });
+    } else if (ActivePointers.length === 2 && direction === "up") {
+        let currentPosition = document.documentElement.scrollTop;
+        window.scrollTo({
+            top: currentPosition + 1200,
+            left: 0,
+            behavior: 'smooth'
+        });
+    } else if (ActivePointers.length === 2 && direction === "down") {
+        let currentPosition = document.documentElement.scrollTop;
+        window.scrollTo({
+            top: currentPosition - 1200,
+            left: 0,
+            behavior: 'smooth'
+        });
     }
     
     if (rafPending) {
