@@ -1,0 +1,23 @@
+{
+  "name": "www-applications",
+  "version": "1.0.0",
+  "description": "Implementation of multi touch gestures using native APIs.",
+  "main": "index.html",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WaldHeri/Aalto-www-applications.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WaldHeri/Aalto-www-applications/issues"
+  },
+  "homepage": "https://github.com/WaldHeri/Aalto-www-applications#readme"
+}
