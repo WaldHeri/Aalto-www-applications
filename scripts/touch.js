@@ -6,7 +6,6 @@ console.log("Start");
 var pointerDownName = 'pointerdown';
 var pointerUpName = 'pointerup';
 var pointerMoveName = 'pointermove';
-var rafPending = false;
 var initialTouchPos = {};
 var lastTouchPos = {};
 var ActivePointers = [];
@@ -68,8 +67,6 @@ function handleGestureEnd(evt) {
         return;
     }
 
-    rafPending = false;
-
     // Remove Event Listeners
     if (window.PointerEvent) {
         evt.target.releasePointerCapture(evt.pointerId);
@@ -126,14 +123,6 @@ function handleGestureMove(evt) {
             behavior: 'smooth'
         });
     }
-    
-    if (rafPending) {
-        return;
-    }
-
-    rafPending = true;
-
-    //window.requestAnimFrame(onAnimFrame);
 }
 
 
