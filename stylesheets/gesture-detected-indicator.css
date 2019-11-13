@@ -7,6 +7,10 @@
   left: 0;
   bottom: 0;
   right: 0;
+
+  /* Use the same color as bootstrap uses for the links */
+  border-left: solid 0 rgba(0, 123, 255, 0.5);
+  border-right: solid 0 rgba(0, 123, 255, 0.5);
 }
 
 .gesture-detected-indicator.active {
@@ -14,19 +18,11 @@
 }
 
 @keyframes pulse {
-  /* Use the same color as bootstrap uses for the links */
-  from {
-    border-left: solid 0 rgba(0, 123, 255, 0.5);
-    border-right: solid 0 rgba(0, 123, 255, 0.5);
-  }
-
   50% {
-    border-left: solid 15px rgba(0, 123, 255, 0.5);
-    border-right: solid 15px rgba(0, 123, 255, 0.5);
+    border-width: 15px;
   }
 
   to {
-    border-left: solid 0 rgba(0, 123, 255, 0.5);
-    border-right: solid 0 rgba(0, 123, 255, 0.5);
+    border-width: 0;
   }
 }
