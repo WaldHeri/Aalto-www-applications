@@ -1,0 +1,32 @@
+.gesture-detected-indicator {
+  position: fixed;
+  /* Because bootstrap sets the navbar's z-index to 1030 (which is real nice),
+   and this needs to be on top of the nav, set z-index to 1031 */
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.gesture-detected-indicator.active {
+  animation: 0.5s pulse ease-in-out;
+}
+
+@keyframes pulse {
+  /* Use the same color as bootstrap uses for the links */
+  from {
+    border-left: solid 0 rgba(0, 123, 255, 0.5);
+    border-right: solid 0 rgba(0, 123, 255, 0.5);
+  }
+
+  50% {
+    border-left: solid 15px rgba(0, 123, 255, 0.5);
+    border-right: solid 15px rgba(0, 123, 255, 0.5);
+  }
+
+  to {
+    border-left: solid 0 rgba(0, 123, 255, 0.5);
+    border-right: solid 0 rgba(0, 123, 255, 0.5);
+  }
+}

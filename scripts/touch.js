@@ -83,7 +83,6 @@ function handleGestureEnd(evt) {
 }
 
 function handleGestureMove(evt) {
-
     console.log("HANDLE GESTURE MOVE!");
 
     evt.preventDefault();
@@ -102,12 +101,14 @@ function handleGestureMove(evt) {
             left: 0,
             behavior: 'smooth'
         });
+    
     } else if (ActivePointers.length === 3 && direction === "down") {
         window.scrollTo({
             top: 0,
             left: 0,
             behavior: 'smooth'
         });
+    
     } else if (ActivePointers.length === 2 && direction === "up") {
         let currentPosition = document.documentElement.scrollTop;
         window.scrollTo({
@@ -115,6 +116,7 @@ function handleGestureMove(evt) {
             left: 0,
             behavior: 'smooth'
         });
+    
     } else if (ActivePointers.length === 2 && direction === "down") {
         let currentPosition = document.documentElement.scrollTop;
         window.scrollTo({
@@ -122,7 +124,16 @@ function handleGestureMove(evt) {
             left: 0,
             behavior: 'smooth'
         });
+    
+    // If no action was triggered, return
+    } else {
+        return;
     }
+
+    // Otherwise trigger animation for gesture detection
+    const animationElem = document.getElementsByClassName('gesture-detected-indicator')[0];
+    animationElem.classList.add('active');
+    setTimeout(() => animationElem.classList.remove('active'), 500);
 }
 
 
