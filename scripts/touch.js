@@ -1,16 +1,17 @@
 
 console.log("Start");
 
+let pointerDownName = 'pointerdown';
+let pointerUpName = 'pointerup';
+let pointerMoveName = 'pointermove';
+let initialTouchPos = {};
+let lastTouchPos = {};
+let ActivePointers = [];
 
+let touchTarget = window;
 
-var pointerDownName = 'pointerdown';
-var pointerUpName = 'pointerup';
-var pointerMoveName = 'pointermove';
-var initialTouchPos = {};
-var lastTouchPos = {};
-var ActivePointers = [];
-
-var touchTarget = window;
+let lastPositionX = 0;
+let lastPositionY = 0;
 
 if (window.navigator.msPointerEnabled) {
     pointerDownName = 'MSPointerDown';
@@ -24,8 +25,6 @@ if (window.PointerEvent || window.navigator.msPointerEnabled) {
     window.PointerEventsSupport = true;
     console.log("PointerEvent true " + pointerDownName);
 }
-
-
 
 
 // Handle the start of gestures
@@ -90,11 +89,20 @@ function handleGestureMove(evt) {
     if (!initialTouchPos) {
         return;
     }
-    lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
+
+    let touchPosition = lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
     
+    lastPositionX = touchPosition.x;
+    lastPositionY = touchPosition.y;
+    let distanceX = Math.abs(lastPositionX - touchPosition.x);
+    let distanceY = Math.abs(lastPositionY - touchPosition.y);
+
     let direction = getDirectionFromEvents();
 
-    if (ActivePointers.length === 3 && direction === "up") {
+    // TODO: check direction for this...
+    if (ActivePointers.length === 2 && distanceX < 50 && distanceY < 50) {
+        alert("hooray!");
+    } else if (ActivePointers.length === 3 && direction === "up") {
         let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
             top: scrollingElement.scrollHeight,
@@ -154,7 +162,7 @@ function getGesturePointFromEvent(evt) {
     return point;
 }
 
-function getDirectionFromEvents(){
+function getDirectionFromEvents() {
     let up = true;
     let down = true;
     
