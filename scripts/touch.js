@@ -92,17 +92,15 @@ function handleGestureMove(evt) {
 
     let touchPosition = lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
     
-    lastPositionX = touchPosition.x;
-    lastPositionY = touchPosition.y;
     let distanceX = Math.abs(lastPositionX - touchPosition.x);
     let distanceY = Math.abs(lastPositionY - touchPosition.y);
+    lastPositionX = touchPosition.x;
+    lastPositionY = touchPosition.y;
 
     let direction = getDirectionFromEvents();
 
-    // TODO: check direction for this...
-    if (ActivePointers.length === 2 && distanceX < 50 && distanceY < 50) {
-        alert("hooray!");
-    } else if (ActivePointers.length === 3 && direction === "up") {
+    // consider to refactor this to use switch case
+    if (ActivePointers.length === 3 && direction === "up") {
         let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
             top: scrollingElement.scrollHeight,
@@ -132,7 +130,10 @@ function handleGestureMove(evt) {
             left: 0,
             behavior: 'smooth'
         });
-    
+    // TODO: check direction for this: have to check that the first pointer does not move (or move only a little) and the direction of other pointer
+    } else if (ActivePointers.length === 2 && distanceY < 30) {
+        alert("hooray!");
+
     // If no action was triggered, return
     } else {
         return;
@@ -162,6 +163,8 @@ function getGesturePointFromEvent(evt) {
     return point;
 }
 
+
+// TODO: refactor this to take single active pointer as a parameter and return to direction of it 
 function getDirectionFromEvents() {
     let up = true;
     let down = true;
