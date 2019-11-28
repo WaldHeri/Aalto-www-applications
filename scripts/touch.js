@@ -8,11 +8,63 @@ let initialTouchPos = {};
 let lastTouchPos = {};
 let ActivePointers = [];
 
-let swipeThreshold = 50;
-let stillThreshold = 5;
+const params = {
+    swipeThreshold: 50,
+    stillThreshold: 5,
+    pageSize: 1200
+}
+
+const gestureToEffectIdx = {
+    "2-swipe-up": 0,
+    "2-swipe-down": 1,
+    "2-swipe-left": 4,
+    "2-swipe-right": 5,
+    "3-swipe-up": 2,
+    "3-swipe-down": 3,
+    "hold-n-swipe-up": 2,
+    "hold-n-swipe-down": 3
+};
+
+const allEffects = [
+    scrollPageDown,
+    scrollPageUp,
+    scrollBottom,
+    scrollTop,
+    moveCarouselNext,
+    moveCarouselPrev
+];
 
 const touchTarget = window;
 
+
+/// CONFIGURATION FORM FIELDS
+
+// Initialize configuration form fields to default values
+$(document).ready(() => {
+    const idsToValues = [
+        ...Object.entries(gestureToEffectIdx),
+        ...Object.entries(params)
+    ];
+
+    idsToValues.forEach(([id, value]) => 
+        $(`#${id}`).val(value)
+    );
+});
+
+function handleFormFieldChange(formElem) {
+    const id = formElem.id;
+    const tag = formElem.tagName;
+    const value = parseInt(formElem.value); // All values are numerical
+
+    // Gesture effects are handled with select
+    if (tag === "SELECT") {
+        gestureToEffectIdx[id] = value;
+
+    // All other form field values are in params
+    } else {
+        params[id] = value;
+    }
+}
 
 /// OLD IE SUPPORT
 
@@ -28,15 +80,44 @@ if (window.PointerEvent || window.navigator.msPointerEnabled) {
 }
 
 
+/// GESTURE EFFECTS
+function scrollToVertical(top) {
+    window.scrollTo({
+        top: top,
+        left: 0,
+        behavior: 'smooth'
+    });
+}
+
+function scrollBottom() {
+    const scrollingElement = (document.scrollingElement || document.body);
+    scrollToVertical(scrollingElement.scrollHeight);
+}
+
+function scrollTop() {
+    scrollToVertical(0);
+}
+
+function scrollPageUp() {
+    scrollToVertical(document.documentElement.scrollTop - params.pageSize);
+}
+
+function scrollPageDown() {
+    scrollToVertical(document.documentElement.scrollTop + params.pageSize)
+}
+
+function moveCarouselNext() {
+    $('.carousel').carousel('next');
+}
+
+function moveCarouselPrev() {
+    $('.carousel').carousel('prev');
+}
+
+
 /// GESTURE HANDLING
 
 function handleGestureStart(evt) {
-    evt.preventDefault();
-    
-    if (evt.touches && evt.touches.length > 1) {
-        return;
-    }
-    
     // Add the move and end listeners
     if (window.PointerEvent) {
         evt.target.setPointerCapture(evt.pointerId);
@@ -81,65 +162,47 @@ function handleGestureMove(evt) {
     }
 
     lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);    
+    const gestureType = getGestureType();
 
+    if (gestureType === null) {
+        return;
+    } 
+
+    const effectIdx = gestureToEffectIdx[gestureType];
+    const gestureEffect = allEffects[effectIdx];
+
+    gestureEffect();
+    showGestureDetectedEffect();
+}
+
+function getGestureType() {
     if (isMultiSwipe('up', 3)) {
-        let scrollingElement = (document.scrollingElement || document.body);
-        window.scrollTo({
-            top: scrollingElement.scrollHeight,
-            left: 0,
-            behavior: 'smooth'
-        });
+        return "3-swipe-up";
     
     } else if (isMultiSwipe('down', 3)) {
-        window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-        });
+        return "3-swipe-down";
     
     } else if (isMultiSwipe('up', 2)) {
-        let currentPosition = document.documentElement.scrollTop;
-        window.scrollTo({
-            top: currentPosition + 1200,
-            left: 0,
-            behavior: 'smooth'
-        });
+        return "2-swipe-up";
     
     } else if (isMultiSwipe('down', 2)) {
-        let currentPosition = document.documentElement.scrollTop;
-        window.scrollTo({
-            top: currentPosition - 1200,
-            left: 0,
-            behavior: 'smooth'
-        });
+        return "2-swipe-down";
 
     } else if (isMultiSwipe('left', 2)) {
-        $('.carousel').carousel('next');
+        return "2-swipe-left";
         
     } else if (isMultiSwipe('right', 2)) {
-        $('.carousel').carousel('prev');
+        return "2-swipe-right";
 
     } else if (isHoldAndSwipe('up')) {
-        let scrollingElement = (document.scrollingElement || document.body);
-        window.scrollTo({
-            top: scrollingElement.scrollHeight,
-            left: 0,
-            behavior: 'smooth'
-        });
+        return "hold-n-swipe-up";
 
     } else if (isHoldAndSwipe('down')) {
-        window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-        });
+        return "hold-n-swipe-down";
 
-    // If no gesture was recognized, return
     } else {
-        return;
+        return null;
     }
-
-    showGestureDetectedEffect();
 }
 
 
@@ -174,13 +237,13 @@ function getPosChange(activePointer, axis) {
 function getIsSwipe(dir) {
     switch (dir) {
         case 'up':
-            return (actPtr) => getPosChange(actPtr, 'y') < -swipeThreshold;
+            return (actPtr) => getPosChange(actPtr, 'y') < -params.swipeThreshold;
         case 'down':
-            return (actPtr) => getPosChange(actPtr, 'y') > swipeThreshold;
+            return (actPtr) => getPosChange(actPtr, 'y') > params.swipeThreshold;
         case 'left':
-            return (actPtr) => getPosChange(actPtr, 'x') < -swipeThreshold;
+            return (actPtr) => getPosChange(actPtr, 'x') < -params.swipeThreshold;
         case 'right':
-            return (actPtr) => getPosChange(actPtr, 'x') > swipeThreshold;
+            return (actPtr) => getPosChange(actPtr, 'x') > params.swipeThreshold;
     }
 }
 
@@ -203,8 +266,8 @@ function isHoldAndSwipe(dir) {
 
     const swipeGesture = ActivePointers.some(isSwipeDir);
     const holdGesture = ActivePointers.some((actPtr) => 
-                                                Math.abs(getPosChange(actPtr, 'y')) < stillThreshold &&
-                                                Math.abs(getPosChange(actPtr, 'x')) < stillThreshold);
+                                                Math.abs(getPosChange(actPtr, 'y')) < params.stillThreshold &&
+                                                Math.abs(getPosChange(actPtr, 'x')) < params.stillThreshold);
 
     return swipeGesture && holdGesture && ActivePointers.length === 2;
 }

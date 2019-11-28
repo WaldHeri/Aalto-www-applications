@@ -579,6 +579,182 @@
           </div>
         </div>
 
+        <hr class="featurette-divider" />
+
+        <div class="row featurette">
+          <div class="col-md-7">
+            <h2 class="featurette-heading">
+              Customize gestures and effects
+            </h2>
+          </div>
+          <form class="col-md-7" onsubmit="event.preventDefault()">
+            <fieldset class="form-group">
+              <legend>
+                Gesture parameters
+              </legend>
+              <div class="form-group">
+                <label for="swipeTheshold"
+                  >Swipe gesture recognition threshold (px)</label
+                >
+                <input
+                  type="number"
+                  oninput="handleFormFieldChange(this);"
+                  class="form-control"
+                  id="swipeThreshold"
+                />
+              </div>
+              <div class="form-group">
+                <label for="stillTheshold"
+                  >Allowed movement for still gestures (px)</label
+                >
+                <input
+                  type="number"
+                  oninput="handleFormFieldChange(this);"
+                  class="form-control"
+                  id="stillThreshold"
+                />
+              </div>
+            </fieldset>
+            <fieldset class="form-group">
+              <legend>Gesture effects</legend>
+              <div class="form-group">
+                <label for="2-swipe-up">Two-finger swipe up</label>
+                <select
+                  class="form-control"
+                  id="2-swipe-up"
+                  onchange="handleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="2-swipe-down">Two-finger swipe down</label>
+                <select
+                  class="form-control"
+                  id="2-swipe-down"
+                  onchange="gehandleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="2-swipe-left">Two-finger swipe left</label>
+                <select
+                  class="form-control"
+                  id="2-swipe-left"
+                  onchange="gehandleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="2-swipe-right">Two-finger swipe right</label>
+                <select
+                  class="form-control"
+                  id="2-swipe-right"
+                  onchange="geshandleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="3-swipe-up">Three-finger swipe up</label>
+                <select
+                  class="form-control"
+                  id="3-swipe-up"
+                  onchange="handleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="3-swipe-down">Three-finger swipe down</label>
+                <select
+                  class="form-control"
+                  id="3-swipe-down"
+                  onchange="gehandleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="hold-n-swipe-up">Hold still + swipe up</label>
+                <select
+                  class="form-control"
+                  id="hold-n-swipe-up"
+                  onchange="gestuhandleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="hold-n-swipe-down">Hold still + swipe down</label>
+                <select
+                  class="form-control"
+                  id="hold-n-swipe-down"
+                  onchange="gesturehandleFormFieldChange(this);"
+                >
+                  <option value="0">Scroll page down</option>
+                  <option value="1">Scroll page up</option>
+                  <option value="2">Scroll to bottom</option>
+                  <option value="3">Scroll to top</option>
+                  <option value="4">Show next carousel item</option>
+                  <option value="5">Show previous carousel item</option>
+                </select>
+              </div>
+            </fieldset>
+            <fieldset class="form-group">
+              <legend>
+                Effect parameters
+              </legend>
+              <div class="form-group">
+                <label for="pageSize">Page size (px)</label>
+                <input
+                  type="number"
+                  oninput="handleFormFieldChange(this);"
+                  class="form-control"
+                  id="pageSize"
+                />
+              </div>
+            </fieldset>
+          </form>
+        </div>
+
         <!-- /END THE FEATURETTES -->
       </div>
       <!-- /.container -->
