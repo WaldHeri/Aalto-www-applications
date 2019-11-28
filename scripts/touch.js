@@ -1,5 +1,4 @@
-
-console.log("Start");
+/// GLOBALS
 
 let pointerDownName = 'pointerdown';
 let pointerUpName = 'pointerup';
@@ -8,10 +7,10 @@ let initialTouchPos = {};
 let lastTouchPos = {};
 let ActivePointers = [];
 
-let touchTarget = window;
+const touchTarget = window;
 
-let lastPositionX = 0;
-let lastPositionY = 0;
+
+/// OLD IE SUPPORT
 
 if (window.navigator.msPointerEnabled) {
     pointerDownName = 'MSPointerDown';
@@ -19,22 +18,17 @@ if (window.navigator.msPointerEnabled) {
     pointerMoveName = 'MSPointerMove';
 }
 
-
 window.PointerEventsSupport = false;
 if (window.PointerEvent || window.navigator.msPointerEnabled) {
     window.PointerEventsSupport = true;
-    console.log("PointerEvent true " + pointerDownName);
 }
 
 
-// Handle the start of gestures
+/// GESTURE HANDLING
+
 function handleGestureStart(evt) {
     evt.preventDefault();
     
-    console.log("touch start " + ActivePointers.length);
-
-    // alert("active pointers: " + ActivePointers.length);
-
     if (evt.touches && evt.touches.length > 1) {
         return;
     }
@@ -43,24 +37,18 @@ function handleGestureStart(evt) {
     if (window.PointerEvent) {
         evt.target.setPointerCapture(evt.pointerId);
         ActivePointers.push(evt);
-        console.log("touch pointerid: " + evt.pointerId);
         initialTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
+
     } else {
         // Add Mouse Listeners
         document.addEventListener('mousemove', this.handleGestureMove, true);
         document.addEventListener('mouseup', this.handleGestureEnd, true);
     }
-
-    
-
-
 };
 
-// Handle end gestures
 function handleGestureEnd(evt) {
     evt.preventDefault();
     ActivePointers = [];
-    console.log("touch end: " + ActivePointers.length);
 
     if (evt.touches && evt.touches.length > 0) {
         return;
@@ -74,33 +62,21 @@ function handleGestureEnd(evt) {
         document.removeEventListener('mousemove', this.handleGestureMove, true);
         document.removeEventListener('mouseup', this.handleGestureEnd, true);
     }
-
-
     
     initialTouchPos = {};
     lastTouchPos = {};
 }
 
 function handleGestureMove(evt) {
-    console.log("HANDLE GESTURE MOVE!");
-
     evt.preventDefault();
     
     if (!initialTouchPos) {
         return;
     }
 
-    let touchPosition = lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);
-    
-    let distanceX = Math.abs(lastPositionX - touchPosition.x);
-    let distanceY = Math.abs(lastPositionY - touchPosition.y);
-    lastPositionX = touchPosition.x;
-    lastPositionY = touchPosition.y;
+    lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);    
 
-    let direction = getDirectionFromEvents();
-
-    // consider to refactor this to use switch case
-    if (ActivePointers.length === 3 && direction === "up") {
+    if (isGestureUp(3)) {
         let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
             top: scrollingElement.scrollHeight,
@@ -108,14 +84,14 @@ function handleGestureMove(evt) {
             behavior: 'smooth'
         });
     
-    } else if (ActivePointers.length === 3 && direction === "down") {
+    } else if (isGestureDown(3)) {
         window.scrollTo({
             top: 0,
             left: 0,
             behavior: 'smooth'
         });
     
-    } else if (ActivePointers.length === 2 && direction === "up") {
+    } else if (isGestureUp(2)) {
         let currentPosition = document.documentElement.scrollTop;
         window.scrollTo({
             top: currentPosition + 1200,
@@ -123,32 +99,31 @@ function handleGestureMove(evt) {
             behavior: 'smooth'
         });
     
-    } else if (ActivePointers.length === 2 && direction === "down") {
+    } else if (isGestureDown(2)) {
         let currentPosition = document.documentElement.scrollTop;
         window.scrollTo({
             top: currentPosition - 1200,
             left: 0,
             behavior: 'smooth'
         });
+
     // TODO: check direction for this: have to check that the first pointer does not move (or move only a little) and the direction of other pointer
-    } else if (ActivePointers.length === 2 && distanceY < 30) {
+    } else if (false) {
         alert("hooray!");
 
-    // If no action was triggered, return
+    // If no gesture was recognized, return
     } else {
         return;
     }
 
-    // Otherwise trigger animation for gesture detection
-    const animationElem = document.getElementsByClassName('gesture-detected-indicator')[0];
-    animationElem.classList.add('active');
-    setTimeout(() => animationElem.classList.remove('active'), 500);
+    showGestureDetectedEffect();
 }
 
 
+/// HELPERS
 
 function getGesturePointFromEvent(evt) {
-    var point = {};
+    const point = {};
 
     if (evt.targetTouches) {
         // Prefer Touch Events
@@ -163,39 +138,36 @@ function getGesturePointFromEvent(evt) {
     return point;
 }
 
+function getPosChange(activePointer, axis) {
+    const id = activePointer.pointerId;
+    return lastTouchPos[id][axis] - initialTouchPos[id][axis];   
+}
 
-// TODO: refactor this to take single active pointer as a parameter and return to direction of it 
-function getDirectionFromEvents() {
-    let up = true;
-    let down = true;
-    
-    for (let i = 0; i < ActivePointers.length; i++) {
-        let id = ActivePointers[i].pointerId;
-        let deltaY = lastTouchPos[id].y - initialTouchPos[id].y;
-        if (deltaY >= 0) {
-            up = false;
-        }
-        if (deltaY <= 0) {
-            down = false;
-        }
+function isGestureUp(pointerCount) {
+    const allGesturesUp = ActivePointers.every((actPtr) => getPosChange(actPtr, 'y') < 0);
+    return ActivePointers.length === pointerCount && allGesturesUp;
+}
 
-    }
-    if (up) {
-        return "up";
-    } else if (down) {
-        return "down";
-    } else {
-        return "none";
-    }
+function isGestureDown(pointerCount) {
+    const allGesturesUp = ActivePointers.every((actPtr) => getPosChange(actPtr, 'y') > 0);
+    return ActivePointers.length === pointerCount && allGesturesUp;
+}
+
+function showGestureDetectedEffect() {
+    const animationElem = document.getElementsByClassName('gesture-detected-indicator')[0];
+    animationElem.classList.add('active');
+    setTimeout(() => animationElem.classList.remove('active'), 500);
 }
 
 
+/// INITIALIZATION
+
 if (window.PointerEvent) {
-    console.log("PointerEvent true!");
     touchTarget.addEventListener('pointerdown', this.handleGestureStart, true);
     touchTarget.addEventListener('pointermove', this.handleGestureMove, true);
     touchTarget.addEventListener('pointerup', this.handleGestureEnd, true);
     touchTarget.addEventListener('pointercancel', this.handleGestureEnd, true);
+
 } else {
     touchTarget.addEventListener('touchstart', this.handleGestureStart, true);
     touchTarget.addEventListener('touchmove', this.handleGestureMove, true);
@@ -204,16 +176,6 @@ if (window.PointerEvent) {
 
     touchTarget.addEventListener('mousedown', this.handleGestureStart, true);
 }
-
-function handleGestureEnd(evt) {
-    console.log("handleGestureEnd");
-    console.log(ActivePointers.length);
-
-    // remove all active pointers when gesture handling is done
-    ActivePointers = [];
-    console.log(ActivePointers.length);
-}
-
 
 window.onload = function () {
     'use strict';
