@@ -114,17 +114,16 @@ function handleGestureMove(evt) {
         });
 
     } else if (isHoldAndSwipe('up')) {
-        let currentPosition = document.documentElement.scrollTop;
+        let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
-            top: currentPosition + 1200,
+            top: scrollingElement.scrollHeight,
             left: 0,
             behavior: 'smooth'
         });
 
     } else if (isHoldAndSwipe('down')) {
-        let currentPosition = document.documentElement.scrollTop;
         window.scrollTo({
-            top: currentPosition - 1200,
+            top: 0,
             left: 0,
             behavior: 'smooth'
         });
