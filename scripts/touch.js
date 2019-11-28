@@ -113,6 +113,12 @@ function handleGestureMove(evt) {
             behavior: 'smooth'
         });
 
+    } else if (isMultiSwipe('left', 2)) {
+        $('.carousel').carousel('next');
+        
+    } else if (isMultiSwipe('right', 2)) {
+        $('.carousel').carousel('prev');
+
     } else if (isHoldAndSwipe('up')) {
         let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
@@ -168,9 +174,13 @@ function getPosChange(activePointer, axis) {
 function getIsSwipe(dir) {
     switch (dir) {
         case 'up':
-            return (actPtr) => getPosChange(actPtr, 'y') < -swipeThreshold
+            return (actPtr) => getPosChange(actPtr, 'y') < -swipeThreshold;
         case 'down':
             return (actPtr) => getPosChange(actPtr, 'y') > swipeThreshold;
+        case 'left':
+            return (actPtr) => getPosChange(actPtr, 'x') < -swipeThreshold;
+        case 'right':
+            return (actPtr) => getPosChange(actPtr, 'x') > swipeThreshold;
     }
 }
 
