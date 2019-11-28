@@ -3,9 +3,14 @@
 let pointerDownName = 'pointerdown';
 let pointerUpName = 'pointerup';
 let pointerMoveName = 'pointermove';
+
 let initialTouchPos = {};
 let lastTouchPos = {};
 let ActivePointers = [];
+let gestureRecognized = false;
+
+let swipeThreshold = 50;
+let stillThreshold = 5;
 
 const touchTarget = window;
 
@@ -48,7 +53,7 @@ function handleGestureStart(evt) {
 
 function handleGestureEnd(evt) {
     evt.preventDefault();
-    ActivePointers = [];
+    ActivePointers = []; // alas?
 
     if (evt.touches && evt.touches.length > 0) {
         return;
@@ -63,20 +68,22 @@ function handleGestureEnd(evt) {
         document.removeEventListener('mouseup', this.handleGestureEnd, true);
     }
     
+    gestureRecognized = false;
     initialTouchPos = {};
     lastTouchPos = {};
+    console.log('end');
 }
 
 function handleGestureMove(evt) {
     evt.preventDefault();
-    
+
     if (!initialTouchPos) {
         return;
     }
 
     lastTouchPos[evt.pointerId] = getGesturePointFromEvent(evt);    
 
-    if (isGestureUp(3)) {
+    if (isMultiSwipe('up', 3)) {
         let scrollingElement = (document.scrollingElement || document.body);
         window.scrollTo({
             top: scrollingElement.scrollHeight,
@@ -84,14 +91,14 @@ function handleGestureMove(evt) {
             behavior: 'smooth'
         });
     
-    } else if (isGestureDown(3)) {
+    } else if (isMultiSwipe('down', 3)) {
         window.scrollTo({
             top: 0,
             left: 0,
             behavior: 'smooth'
         });
     
-    } else if (isGestureUp(2)) {
+    } else if (isMultiSwipe('up', 2)) {
         let currentPosition = document.documentElement.scrollTop;
         window.scrollTo({
             top: currentPosition + 1200,
@@ -99,7 +106,7 @@ function handleGestureMove(evt) {
             behavior: 'smooth'
         });
     
-    } else if (isGestureDown(2)) {
+    } else if (isMultiSwipe('down', 2)) {
         let currentPosition = document.documentElement.scrollTop;
         window.scrollTo({
             top: currentPosition - 1200,
@@ -107,9 +114,21 @@ function handleGestureMove(evt) {
             behavior: 'smooth'
         });
 
-    // TODO: check direction for this: have to check that the first pointer does not move (or move only a little) and the direction of other pointer
-    } else if (false) {
-        alert("hooray!");
+    } else if (isHoldAndSwipe('up')) {
+        let currentPosition = document.documentElement.scrollTop;
+        window.scrollTo({
+            top: currentPosition + 1200,
+            left: 0,
+            behavior: 'smooth'
+        });
+
+    } else if (isHoldAndSwipe('down')) {
+        let currentPosition = document.documentElement.scrollTop;
+        window.scrollTo({
+            top: currentPosition - 1200,
+            left: 0,
+            behavior: 'smooth'
+        });
 
     // If no gesture was recognized, return
     } else {
@@ -140,17 +159,46 @@ function getGesturePointFromEvent(evt) {
 
 function getPosChange(activePointer, axis) {
     const id = activePointer.pointerId;
+
+    if (!lastTouchPos[id] || !initialTouchPos[id]) {
+        return null;
+    }
+
     return lastTouchPos[id][axis] - initialTouchPos[id][axis];   
 }
 
-function isGestureUp(pointerCount) {
-    const allGesturesUp = ActivePointers.every((actPtr) => getPosChange(actPtr, 'y') < 0);
-    return ActivePointers.length === pointerCount && allGesturesUp;
+function getIsSwipe(dir) {
+    switch (dir) {
+        case 'up':
+            return (actPtr) => getPosChange(actPtr, 'y') < -swipeThreshold
+        case 'down':
+            return (actPtr) => getPosChange(actPtr, 'y') > swipeThreshold;
+}
 }
 
-function isGestureDown(pointerCount) {
-    const allGesturesUp = ActivePointers.every((actPtr) => getPosChange(actPtr, 'y') > 0);
-    return ActivePointers.length === pointerCount && allGesturesUp;
+/*
+ * Check that there are `pointerCount` active pointers, and that all have moved to `dir` direction.
+ */
+function isMultiSwipe(dir, pointerCount) {
+    const isSwipeDir = getIsSwipe(dir);
+    const allGesturesDir = ActivePointers.every(isSwipeDir);
+
+    return ActivePointers.length === pointerCount && allGesturesDir;
+}
+
+/*
+ * Check that one pointer has moved up by at least `swipeThreshold` and that the other pointer
+ * has stayed still, i.e. moved at most `stillThreshold`.
+ */
+function isHoldAndSwipe(dir) {
+    const isSwipeDir = getIsSwipe(dir);
+
+    const swipeGesture = ActivePointers.some(isSwipeDir);
+    const holdGesture = ActivePointers.some((actPtr) => 
+                                                Math.abs(getPosChange(actPtr, 'y')) < stillThreshold &&
+                                                Math.abs(getPosChange(actPtr, 'x')) < stillThreshold);
+
+    return swipeGesture && holdGesture && ActivePointers.length === 2;
 }
 
 function showGestureDetectedEffect() {
