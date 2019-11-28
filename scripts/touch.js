@@ -7,7 +7,6 @@ let pointerMoveName = 'pointermove';
 let initialTouchPos = {};
 let lastTouchPos = {};
 let ActivePointers = [];
-let gestureRecognized = false;
 
 let swipeThreshold = 50;
 let stillThreshold = 5;
@@ -51,13 +50,18 @@ function handleGestureStart(evt) {
     }
 };
 
+function removePointerData(id) {
+    const removeIdx = ActivePointers.findIndex(actPtr => actPtr.pointerId === id);
+
+    ActivePointers.splice(removeIdx, 1);
+    delete initialTouchPos[id];
+    delete lastTouchPos[id];
+}
+
 function handleGestureEnd(evt) {
     evt.preventDefault();
-    ActivePointers = []; // alas?
 
-    if (evt.touches && evt.touches.length > 0) {
-        return;
-    }
+    removePointerData(evt.pointerId);
 
     // Remove Event Listeners
     if (window.PointerEvent) {
@@ -67,11 +71,6 @@ function handleGestureEnd(evt) {
         document.removeEventListener('mousemove', this.handleGestureMove, true);
         document.removeEventListener('mouseup', this.handleGestureEnd, true);
     }
-    
-    gestureRecognized = false;
-    initialTouchPos = {};
-    lastTouchPos = {};
-    console.log('end');
 }
 
 function handleGestureMove(evt) {
@@ -173,7 +172,7 @@ function getIsSwipe(dir) {
             return (actPtr) => getPosChange(actPtr, 'y') < -swipeThreshold
         case 'down':
             return (actPtr) => getPosChange(actPtr, 'y') > swipeThreshold;
-}
+    }
 }
 
 /*
