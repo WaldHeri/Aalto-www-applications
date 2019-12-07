@@ -22,7 +22,9 @@ const gestureToEffectIdx = {
     "3-swipe-up": 2,
     "3-swipe-down": 3,
     "hold-n-swipe-up": 2,
-    "hold-n-swipe-down": 3
+    "hold-n-swipe-down": 3,
+    "hold-n-swipe-left": 4,
+    "hold-n-swipe-right": 5
 };
 
 const allEffects = [
@@ -199,6 +201,12 @@ function getGestureType() {
 
     } else if (isHoldAndSwipe('down')) {
         return "hold-n-swipe-down";
+
+    } else if (isHoldAndSwipe('left')) {
+        return "hold-n-swipe-left";
+    
+    } else if (isHoldAndSwipe('right')) {
+        return "hold-n-swipe-right";
 
     } else {
         return null;
