@@ -306,11 +306,12 @@ if (window.PointerEvent) {
 
 window.onload = function () {
     'use strict';
+    if (/iP(hone|ad)/.test(window.navigator.userAgent)) {
+        // Make sure :active pseudo classes are applied.
+        document.body.addEventListener('touchstart', function () { }, false);
 
-    // We do this so :active pseudo classes are applied.
-    window.onload = function () {
-        if (/iP(hone|ad)/.test(window.navigator.userAgent)) {
-            document.body.addEventListener('touchstart', function () { }, false);
-        }
-    };
+        // Make the gestures usable: since the desirabel "touch-action": "pan-y" isn't supported
+        // in webkit, and hence not in Safari, Chrome for iOS or firefox for iOS, disable all browser touch actions
+        $("html").css({"touch-action": "none"});
+    }
 }
